@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('categoria_id')->nullable()->constrained('categorias')->onDelete('set null');
 
             // Identificadores
-            $table->string('codigo_activo')->unique()->comment('Codigo unico de activo fijo');
+            $table->string('codigo_activo')->nullable()->comment('Codigo unico de activo fijo');
             $table->string('numero_serie')->nullable();
 
             // Ubicación y Responsable
