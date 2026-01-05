@@ -9,6 +9,9 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\IncidenteController;
 use App\Http\Controllers\InventarioSoftwareController;
+use App\Http\Controllers\Eventos\EventCategoryController;
+use App\Http\Controllers\Eventos\EventController;
+
 // Asegúrate de que el middleware 'sso' esté registrado en bootstrap/app.php
 Route::middleware('sso')->group(function () {
     // Agencias
@@ -20,6 +23,10 @@ Route::middleware('sso')->group(function () {
     Route::apiResource('inventarios', InventarioController::class);
     Route::apiResource('inventario-software', InventarioSoftwareController::class);
     Route::apiResource('incidentes', IncidenteController::class);
+
+    // Módulo Calendario (Eventos)
+    Route::apiResource('event-categories', EventCategoryController::class);
+    Route::apiResource('events', EventController::class);
 
     // Ruta personalizada para historial de incidentes
     Route::get('/inventarios/{id}/incidentes', [IncidenteController::class, 'byInventario']);
