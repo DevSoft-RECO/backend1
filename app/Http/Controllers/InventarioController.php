@@ -7,10 +7,20 @@ use Illuminate\Http\Request;
 
 class InventarioController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Eager load relaciones para optimizar DataTables
-        return Inventario::with(['agencia', 'categoria'])->get();
+        $query = Inventario::with(['agencia', 'categoria']);
+
+        if ($request->filled('agencia_id')) {
+            $query->where('agencia_id', $request->agencia_id);
+        }
+
+        if ($request->filled('categoria_id')) {
+            $query->where('categoria_id', $request->categoria_id);
+        }
+
+        // Paginación de 20 registros por defecto
+        return $query->paginate($request->input('per_page', 20));
     }
 
     public function store(Request $request)
