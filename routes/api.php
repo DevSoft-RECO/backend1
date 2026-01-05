@@ -8,7 +8,7 @@ use App\Http\Controllers\AgenciaController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\IncidenteController;
-
+use App\Http\Controllers\InventarioSoftwareController;
 // Asegúrate de que el middleware 'sso' esté registrado en bootstrap/app.php
 Route::middleware('sso')->group(function () {
     // Agencias
@@ -18,6 +18,7 @@ Route::middleware('sso')->group(function () {
     // Módulos de Inventario
     Route::apiResource('categorias', CategoriaController::class);
     Route::apiResource('inventarios', InventarioController::class);
+    Route::apiResource('inventario-software', InventarioSoftwareController::class);
     Route::apiResource('incidentes', IncidenteController::class);
 
     // Ruta personalizada para historial de incidentes
