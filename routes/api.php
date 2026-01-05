@@ -19,6 +19,7 @@ Route::middleware('sso')->group(function () {
     Route::get('/agencias', [AgenciaController::class, 'index']);
 
     // Módulos de Inventario
+    Route::get('/inventarios/exportar', [InventarioController::class, 'export']);
     Route::apiResource('categorias', CategoriaController::class);
     Route::apiResource('inventarios', InventarioController::class);
     Route::apiResource('inventario-software', InventarioSoftwareController::class);
