@@ -14,6 +14,11 @@ use App\Http\Controllers\Eventos\EventController;
 
 // Asegúrate de que el middleware 'sso' esté registrado en bootstrap/app.php
 Route::middleware('sso')->group(function () {
+    Route::get('/me', function (Request $request) {
+        return response()->json($request->user());
+    });
+
+
     // Agencias
     Route::post('/sincronizar-agencias', [AgencySyncController::class, 'sync']);
     Route::get('/agencias', [AgenciaController::class, 'index']);
