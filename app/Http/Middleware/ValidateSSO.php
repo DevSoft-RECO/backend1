@@ -35,7 +35,7 @@ class ValidateSSO
 
             // 2. Sincronizar con la Madre (JIT - Just In Time)
             // Esto asegura que si el usuario fue bloqueado en la Madre, el hijo lo sepa de inmediato.
-            $motherUrl = env('VITE_MOTHER_API_URL', 'http://localhost:8000');
+            $motherUrl = config('services.app_madre.url', 'http://localhost:8000');
             $response = \Illuminate\Support\Facades\Http::withToken($token)
                 ->acceptJson()
                 ->get("{$motherUrl}/api/me");
