@@ -67,6 +67,8 @@ class ValidateSSO
                 'id' => $userData['id'] ?? $decoded->sub,
                 'name' => $userData['name'] ?? null,
                 'email' => $userData['email'] ?? null,
+                'avatar' => $userData['avatar'] ?? $userData['foto'] ?? null,
+                'puesto' => $userData['puesto'] ?? $userData['position'] ?? null,
                 'roles' => $userData['roles'] ?? [],
                 'permisos' => $userData['permisos'] ?? [],
                 'permissions' => $userData['permisos'] ?? [], // Fallback estandarizado
