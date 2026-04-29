@@ -32,6 +32,8 @@ class Inventario extends Model
         'antivirus',
         'bloqueo_usb',
         'es_remoto',
+        'usuario_admin',
+        'pass_admin',
         'observaciones'
     ];
 

@@ -119,6 +119,8 @@ class InventarioController extends Controller
                 'Office',
                 'Licencia Office',
                 'Antivirus',
+                'Usuario Admin',
+                'Pass Admin',
                 'Observaciones',
                 'Fecha Creacion'
             ]);
@@ -128,8 +130,8 @@ class InventarioController extends Controller
                 foreach ($inventarios as $item) {
                     fputcsv($handle, [
                         $item->id,
-                        $item->agencia ? $item->agencia->nombre : 'N/A', // Corregido: nombre en vez de name
-                        $item->categoria ? $item->categoria->nombre : 'N/A', // Corregido: nombre en vez de name
+                        $item->agencia ? $item->agencia->nombre : 'N/A', 
+                        $item->categoria ? $item->categoria->nombre : 'N/A', 
                         $item->codigo_activo,
                         $item->numero_serie,
                         $item->area,
@@ -150,6 +152,8 @@ class InventarioController extends Controller
                         $item->version_office,
                         $item->licencia_office,
                         $item->antivirus,
+                        $item->usuario_admin,
+                        $item->pass_admin,
                         $item->observaciones,
                         $item->created_at->toDateTimeString()
                     ]);
