@@ -11,12 +11,15 @@ use App\Http\Controllers\IncidenteController;
 use App\Http\Controllers\InventarioSoftwareController;
 use App\Http\Controllers\Eventos\EventCategoryController;
 use App\Http\Controllers\Eventos\EventController;
+use App\Http\Controllers\UserController;
 
 // Asegúrate de que el middleware 'sso' esté registrado en bootstrap/app.php
 Route::middleware('sso')->group(function () {
     Route::get('/me', function (Request $request) {
         return response()->json($request->user());
     });
+
+    Route::get('/users', [UserController::class, 'index']);
 
 
     // Agencias

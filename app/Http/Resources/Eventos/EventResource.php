@@ -22,6 +22,7 @@ class EventResource extends JsonResource
             'color' => $this->category ? $this->category->color : null,
             'text_color' => $this->category ? $this->category->text_color : null,
             'user_id' => $this->user_id,
+            'user' => $this->whenLoaded('user'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

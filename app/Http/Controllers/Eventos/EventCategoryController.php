@@ -19,6 +19,7 @@ class EventCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'user_id' => 'nullable|exists:users,id',
             'color' => 'required|string|max:7',
             'text_color' => 'nullable|string|max:7',
             'is_active' => 'boolean',
@@ -37,6 +38,7 @@ class EventCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
+            'user_id' => 'nullable|exists:users,id',
             'color' => 'sometimes|required|string|max:7',
             'text_color' => 'nullable|string|max:7',
             'is_active' => 'boolean',

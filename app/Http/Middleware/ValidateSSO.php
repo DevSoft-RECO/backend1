@@ -34,17 +34,23 @@ class ValidateSSO
             $decoded = JWT::decode($token, new Key($publicKey, 'RS256'));
 
             // 2. Sincronizar con la Madre (JIT - Just In Time)
-            // Esto asegura que si el usuario fue bloqueado en la Madre, el hijo lo sepa de inmediato.
             $motherUrl = config('services.app_madre.url', 'http://localhost:8000');
             $response = \Illuminate\Support\Facades\Http::withToken($token)
                 ->acceptJson()
                 ->get("{$motherUrl}/api/me");
 
             if ($response->failed()) {
+                \Illuminate\Support\Facades\Log::error("SSO Validation Failed", [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'token_preview' => substr($token, 0, 10) . '...'
+                ]);
                 throw new \Exception("No se pudo validar la sesión con la Madre: " . $response->status());
             }
 
             $userData = $response->json();
+            \Illuminate\Support\Facades\Log::info("SSO Mother App Data", ['data' => $userData]);
+            
             if (isset($userData['data'])) {
                 $userData = $userData['data']; // Desempaquetar si viene en un Resource
             }
@@ -60,30 +66,56 @@ class ValidateSSO
                     return is_array($p) ? ($p['name'] ?? $p) : (is_object($p) ? ($p->name ?? $p) : $p); 
                 }, $userData['permisos']);
             }
+            if (isset($userData['permissions']) && is_array($userData['permissions'])) {
+                 $userData['permissions'] = array_map(function($p) { 
+                    return is_array($p) ? ($p['name'] ?? $p) : (is_object($p) ? ($p->name ?? $p) : $p); 
+                }, $userData['permissions']);
+            }
 
-            // 4. Inyectar usuario en la sesión de Laravel (Memoria)
-            // Creamos un GenericUser que expone sus atributos al ser convertido a JSON
-            $user = new class([
-                'id' => $userData['id'] ?? $decoded->sub,
-                'name' => $userData['name'] ?? null,
-                'email' => $userData['email'] ?? null,
-                'avatar' => $userData['avatar'] ?? $userData['foto'] ?? null,
-                'puesto' => $userData['puesto'] ?? $userData['position'] ?? null,
-                'roles' => $userData['roles'] ?? [],
-                'permisos' => $userData['permisos'] ?? [],
-                'permissions' => $userData['permisos'] ?? [], // Fallback estandarizado
-                'roles_list' => $userData['roles'] ?? [], // Fallback estandarizado
-                'token_scopes' => $decoded->scopes ?? [],
-            ]) extends GenericUser implements \JsonSerializable {
-                public function jsonSerialize(): mixed {
-                    return $this->attributes;
-                }
-            };
+                // 4. Sincronización por Espejo (Mirroring) en BD Local
+                try {
+                    $userId = $userData['id'] ?? $decoded->sub;
+                    
+                    \Illuminate\Support\Facades\Log::info("SSO Mirroring Attempt", [
+                        'target_id' => $userId,
+                        'roles_to_save' => $userData['roles'] ?? []
+                    ]);
 
+                    $user = \App\Models\User::find($userId);
+                    
+                    if (!$user) {
+                        $user = new \App\Models\User();
+                        $user->id = $userId;
+                    }
 
-            Auth::setUser($user);
+                    $user->username = $userData['username'] ?? $user->username;
+                    $user->name = $userData['name'] ?? $user->name;
+                    $user->avatar = ($userData['avatar'] ?? $userData['foto'] ?? $user->avatar);
+                    $user->puesto = (isset($userData['puesto']['name']) ? $userData['puesto']['name'] : (is_string($userData['puesto'] ?? null) ? $userData['puesto'] : $user->puesto));
+                    $user->roles_list = $userData['roles'] ?? [];
+                    $user->permisos_list = $userData['permissions'] ?? $userData['permisos'] ?? [];
+                    
+                    $user->save();
+                    
+                    \Illuminate\Support\Facades\Log::info("SSO Mirroring Saved", [
+                        'saved_id' => $user->id,
+                        'saved_roles' => $user->roles_list
+                    ]);
+
+                    Auth::setUser($user);
+                } catch (\Exception $dbEx) {
+                \Illuminate\Support\Facades\Log::error("SSO Mirroring Database Error", [
+                    'error' => $dbEx->getMessage(),
+                    'user_id' => $userData['id'] ?? 'unknown'
+                ]);
+                throw $dbEx;
+            }
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("SSO Unauthorized Access", [
+                'error' => $e->getMessage(),
+                'ip' => $request->ip()
+            ]);
             return response()->json(['message' => 'Acceso Denegado: ' . $e->getMessage()], 401);
         }
 

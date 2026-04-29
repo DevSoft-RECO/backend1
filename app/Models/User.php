@@ -13,14 +13,25 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * El ID no es autoincremental porque viene de la App Madre
+     */
+    public $incrementing = false;
+    protected $keyType = 'int';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
+        'id',
+        'username',
         'name',
-        'email',
         'password',
+        'avatar',
+        'puesto',
+        'roles_list',
+        'permisos_list',
     ];
 
     /**
@@ -34,6 +45,26 @@ class User extends Authenticatable
     ];
 
     /**
+     * Atributos virtuales para compatibilidad con el Frontend
+     */
+    protected $appends = ['roles', 'permissions', 'permisos'];
+
+    public function getRolesAttribute()
+    {
+        return $this->getAttribute('roles_list') ?? [];
+    }
+
+    public function getPermissionsAttribute()
+    {
+        return $this->getAttribute('permisos_list') ?? [];
+    }
+
+    public function getPermisosAttribute()
+    {
+        return $this->getAttribute('permisos_list') ?? [];
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -43,6 +74,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'roles_list' => 'array',
+            'permisos_list' => 'array',
         ];
     }
 }

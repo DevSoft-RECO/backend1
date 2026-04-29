@@ -14,7 +14,7 @@ class EventController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Event::with('category');
+        $query = Event::with(['category.user', 'user']);
 
         // Filtrado por fecha (overlap)
         if ($request->has(['start_date', 'end_date'])) {

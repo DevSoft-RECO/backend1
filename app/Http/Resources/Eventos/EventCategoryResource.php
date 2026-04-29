@@ -11,6 +11,8 @@ class EventCategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
+            'user' => $this->whenLoaded('user'),
             'name' => $this->name,
             'color' => $this->color,
             'text_color' => $this->text_color,
