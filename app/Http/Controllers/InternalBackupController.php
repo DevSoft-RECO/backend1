@@ -53,6 +53,13 @@ class InternalBackupController extends Controller
             mkdir($backupDir, 0755, true);
         }
 
+        // Limpieza de respaldos huérfanos anteriores (más de 1 hora de antigüedad)
+        foreach (glob($backupDir . '/*') as $file) {
+            if (is_file($file) && (time() - filemtime($file) > 3600)) {
+                @unlink($file);
+            }
+        }
+
         // 4. Lanzar el Artisan Command en background (independiente del SO)
         $callbackUrl = $request->input('callback_url');
         $userId = $request->input('user_id');
