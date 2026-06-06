@@ -40,3 +40,8 @@ Route::middleware('sso')->group(function () {
     // Ruta personalizada para historial de incidentes
     Route::get('/inventarios/{id}/incidentes', [IncidenteController::class, 'byInventario']);
 });
+
+// === BACKUP SYSTEM ===
+// Rutas internas de respaldo llamadas por la APP_MADRE (Firmadas con HMAC)
+Route::post('/internal/backup', [\App\Http\Controllers\InternalBackupController::class, 'generate']);
+Route::get('/internal/download-backup', [\App\Http\Controllers\InternalBackupController::class, 'download']);
