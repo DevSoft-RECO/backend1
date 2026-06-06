@@ -37,8 +37,8 @@ class BackupWorkerCommand extends Command
         $backupDir = storage_path('app/backups');
         $filePath = $backupDir . DIRECTORY_SEPARATOR . $filename;
 
-        // Obtener la ruta del ejecutable mysqldump desde el env
-        $mysqldumpPath = env('BACKUP_MYSQLDUMP_PATH') ?? env('BACKUP_PG_DUMP_PATH') ?? 'mysqldump';
+        // Obtener la ruta del ejecutable mysqldump desde config
+        $mysqldumpPath = config('backups.mysqldump_path') ?? config('backups.pg_dump_path') ?? 'mysqldump';
 
         // Construir comando de volcado
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
@@ -73,7 +73,7 @@ class BackupWorkerCommand extends Command
 
     private function sendCallback($url, $appKey, $filename, $status, $userId, $error = null)
     {
-        $token = env('BACKUP_MADRE_TOKEN');
+        $token = config('backups.token');
         $timestamp = time();
 
         $payload = json_encode([

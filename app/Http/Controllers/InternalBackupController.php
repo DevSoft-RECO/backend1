@@ -18,7 +18,7 @@ class InternalBackupController extends Controller
      */
     public function generate(Request $request)
     {
-        $token = env('BACKUP_MADRE_TOKEN');
+        $token = config('backups.token');
         $signature = $request->header('X-Signature');
         $timestamp = $request->header('X-Timestamp');
 
@@ -87,7 +87,7 @@ class InternalBackupController extends Controller
      */
     public function download(Request $request)
     {
-        $token = env('BACKUP_MADRE_TOKEN');
+        $token = config('backups.token');
         $filename = $request->query('file');
         $timestamp = $request->query('timestamp');
         $signature = $request->query('signature');
